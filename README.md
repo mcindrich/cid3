@@ -18,7 +18,6 @@ if(file) {
 
 ### Frame examples
 ```c
-// example code for outputing root element name, content and first attribute key and value
 #include <cid3.h>
 #include <stdio.h>
 
