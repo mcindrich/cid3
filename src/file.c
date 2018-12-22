@@ -32,16 +32,16 @@ cid3_file* cid3_file_init(const char* fn) {
 cid3_frame* cid3_file_get_album_frame(cid3_file* file) {
 	cid3_tag* tag = &file->tag;
 	for(int i = 0; i < tag->frames.size; i++) 
-		if(tag->frames.data[i]->value && (memcmp("TALB", tag->frames.data[i]->id, 4) == 0)) 
-			return tag->frames.data[i];
+		if(tag->frames.data[i].value && (memcmp("TALB", tag->frames.data[i].id, 4) == 0)) 
+			return &tag->frames.data[i];
 	return NULL;
 }
 
 cid3_frame* cid3_file_get_artist_frame(cid3_file* file) {
 	cid3_tag* tag = &file->tag;
 	for(int i = 0; i < tag->frames.size; i++) 
-		if(tag->frames.data[i]->value && (memcmp("TPE1", tag->frames.data[i]->id, 4) == 0)) 
-			return tag->frames.data[i];
+		if(tag->frames.data[i].value && (memcmp("TPE1", tag->frames.data[i].id, 4) == 0)) 
+			return &tag->frames.data[i];
 	return NULL;
 }
 

@@ -4,7 +4,7 @@
 #include <cid3/frame.h>
 
 typedef struct cid3_frame_list {
-	cid3_frame** data;
+	cid3_frame* data;
 	u32 size;
 } cid3_frame_list;
 

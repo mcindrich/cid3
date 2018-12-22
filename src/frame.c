@@ -26,40 +26,32 @@ int get_frame_size(char* code, int pos) {
 	return res;
 }
 
-cid3_frame* cid3_frame_init(char* code, u32* fpos) {
-	cid3_frame* frame = (cid3_frame*) malloc(sizeof(cid3_frame));	
+cid3_frame cid3_frame_init(char* code, u32* fpos) {
+	cid3_frame frame;
+  frame.value = NULL;
+  frame.size = 0;
+  memset(frame.flags, 0, CID3_FRAME_FLAGS_SIZE);
+  memset(frame.id, 0, CID3_FRAME_ID_SIZE);
+
 	int cnt = 0, i = 0;
 	
-	memcpy(frame->id, &code[*fpos], CID3_FRAME_ID_SIZE); // get the ID
+	memcpy(frame.id, &code[*fpos], CID3_FRAME_ID_SIZE); // get the ID
 	
-	if(memcmp(frame->id, "\0\0\0\0", 4) == 0) { // done with frames ==> treat as the last one
-		free(frame);
-		return NULL;
+	if(memcmp(frame.id, "\0\0\0\0", 4) == 0) { // done with frames ==> treat as the last one
+		return frame;
 	}
 	
-	frame->size = get_frame_size(code, *fpos += CID3_FRAME_ID_SIZE); // read the code ( 4B ) and get the real frame size
+	frame.size = get_frame_size(code, *fpos += CID3_FRAME_ID_SIZE); // read the code ( 4B ) and get the real frame size
 	
-	memcpy(frame->flags, &code[*fpos += CID3_FRAME_SIZE], CID3_FRAME_FLAGS_SIZE);
-	frame->value = (char*) malloc(sizeof(char) * frame->size); // allocate value
+	memcpy(frame.flags, &code[*fpos += CID3_FRAME_SIZE], CID3_FRAME_FLAGS_SIZE);
+	frame.value = (char*) malloc(sizeof(char) * frame.size); // allocate value
 	*fpos += CID3_FRAME_FLAGS_SIZE;
+  memcpy(frame.value, &code[*fpos], frame.size);
 	
-	// parse string correctly
-	
-	for(; i < frame->size; i++) {
-		if(code[*fpos + i])
-			frame->value[cnt] = code[*fpos + i], ++cnt;
-	}
-	frame->value[cnt] = 0; // end
-
-	frame->value = (char*) realloc(frame->value, sizeof(char) * (cnt+1)); // reallocate and save space ==> dumb but why not
-	
-	*fpos += frame->size; // update file position
+	*fpos += frame.size; // update file position
 	return frame;
 }
 
-void cid3_frame_delete(cid3_frame** frame) {
-	if(*frame) {
-		if((*frame)->value) free((*frame)->value);
-		free(*frame);
-	}
+void cid3_frame_delete(cid3_frame* frame) {
+	if(frame->value) free(frame->value);
 }
